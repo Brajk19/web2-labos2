@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome!{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --body-background: #fff;
+        --text-color: #3f3f46;
+        --link-color: #2563eb;
+        --logo-separator-color: #d4d4d8;
+        --code-background: #eee;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --body-background: #27272a;
+            --text-color: #e4e4e7;
+            --link-color: #60a5fa;
+            --logo-separator-color: #71717a;
+            --code-background: #111;
+        }
+    }
+    body {
+        background-color: var(--body-background);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23F4F4F5' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        color: var(--text-color);
+        font: 16px/1.5 sans-serif;
+    }
+    .welcome-wrapper { margin: 3rem 1rem; }
+    .welcome-wrapper .logos { display: flex; align-items: center; margin-bottom: 1rem; }
+    .welcome-wrapper .symfony-logo { border-right: 1px solid var(--logo-separator-color); padding-right: 25px; }
+    .welcome-wrapper .platformsh-logo { margin-left: 30px; position: relative; top: -1px; }
+    .welcome-wrapper .symfony-logo svg { height: auto; width: 145px; }
+    .welcome-wrapper .platformsh-logo svg { height: auto; width: 140px; }
+    .welcome-wrapper .symfony-logo .symfony-logo-brandmark,
+    .welcome-wrapper .symfony-logo .symfony-logo-wordmark { fill: var(--text-color); }
+    .welcome-wrapper .symfony-logo .symfony-logo-brandmark-text { fill: var(--body-background); }
+    .welcome-wrapper .platformsh-logo .platformsh-logo-brandmark,
+    .welcome-wrapper .platformsh-logo .platformsh-logo-wordmark { fill: var(--text-color); }
+    .welcome-wrapper h1 { font-size: 21px; line-height: 1.2; margin-bottom: 1.5rem; }
+    .welcome-wrapper ul { padding-left: 1.5rem; }
+    .welcome-wrapper li { margin-top: .5rem; }
+    .welcome-wrapper a { color: var(--link-color); text-decoration: none; }
+    .welcome-wrapper a:hover { text-decoration: underline; }
+    .welcome-wrapper code { background-color: var(--code-background); padding: 0.2rem 0.4rem; }
+    @media (min-width: 992px) {
+        .welcome-wrapper { margin: 3rem; }
+        .welcome-wrapper h1 { font-size: 24px; letter-spacing: -0.01rem; }
+        .welcome-wrapper ul { padding-left: 2.5rem; }
+        .welcome-wrapper .logos { margin-bottom: 2rem; }
+        .welcome-wrapper .symfony-logo svg { height: auto; width: 175px; }
+        .welcome-wrapper .platformsh-logo svg { height: auto; width: 170px; }
+    }
+    @media (prefers-color-scheme: dark) {
+        body { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%233F3F46' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");}
+    }
+</style>
+
+    <h2>Pozdrav {{ name|raw }}!</h2>
+
+{% endblock %}

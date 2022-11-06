@@ -1,0 +1,6 @@
+framework:
+  rate_limiter:
+    labos_login:
+      policy: 'sliding_window'
+      limit: 5
+      interval: '5 minutes'
